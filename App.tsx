@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-// Interfaz para definir el tipo Estudiante
 interface Estudiante {
   id: number;
   nombre: string;
   carnet: string;
 }
 
-// ---------------- TAB 1: INICIO ----------------
 function InicioScreen() {
   const [contador, setContador] = useState<number>(0);
 
@@ -35,30 +33,47 @@ function InicioScreen() {
   );
 }
 
-// ---------------- TAB 2: ESTUDIANTES ----------------
 interface EstudiantesProps {
   estudiantes: Estudiante[];
   setEstudiantes: React.Dispatch<React.SetStateAction<Estudiante[]>>;
 }
 
 function EstudiantesScreen({ estudiantes, setEstudiantes }: EstudiantesProps) {
-  const agregarEstudiante = () => {
-    const nuevoId = estudiantes.length + 1;
-    const nombresEjemplo = ['Sofía López', 'Diego Mendoza', 'Valeria Castillo', 'Javier Ramos', 'Andrea Morales'];
-    const nombreAleatorio = nombresEjemplo[(nuevoId - 1) % nombresEjemplo.length];
+  const [nombreInput, setNombreInput] = useState<string>('');
 
+  const agregarEstudiante = () => {
+    if (nombreInput.trim() === '') {
+      Alert.alert('Aviso', 'Por favor ingresa un nombre válido.');
+      return;
+    }
+
+    const nuevoId = estudiantes.length + 1;
     const nuevo: Estudiante = {
       id: nuevoId,
-      nombre: `${nombreAleatorio} (${nuevoId})`,
+      nombre: nombreInput.trim(),
       carnet: `UMG-${2026000 + nuevoId}`,
     };
 
     setEstudiantes(prev => [...prev, nuevo]);
+    setNombreInput('');
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.screenTitle}>Listado de Estudiantes</Text>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Nombre del nuevo estudiante"
+          placeholderTextColor="#94a3b8"
+          value={nombreInput}
+          onChangeText={setNombreInput}
+        />
+        <TouchableOpacity style={styles.addButton} onPress={agregarEstudiante}>
+          <Text style={styles.buttonText}>Agregar</Text>
+        </TouchableOpacity>
+      </View>
 
       <FlatList
         data={estudiantes}
@@ -71,15 +86,10 @@ function EstudiantesScreen({ estudiantes, setEstudiantes }: EstudiantesProps) {
           </View>
         )}
       />
-
-      <TouchableOpacity style={styles.addButton} onPress={agregarEstudiante}>
-        <Text style={styles.buttonText}>+ Agregar Estudiante</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
-// ---------------- TAB 3: ESTADÍSTICAS ----------------
 interface EstadisticasProps {
   total: number;
 }
@@ -97,11 +107,9 @@ function EstadisticasScreen({ total }: EstadisticasProps) {
   );
 }
 
-// ---------------- NAVEGADOR PRINCIPAL ----------------
 const Tab = createBottomTabNavigator();
 
 export default function App() {
-  // Lista inicial de 4 estudiantes requerida
   const [estudiantes, setEstudiantes] = useState<Estudiante[]>([
     { id: 1, nombre: 'Carlos Ruiz', carnet: 'UMG-2026001' },
     { id: 2, nombre: 'Ana Morales', carnet: 'UMG-2026002' },
@@ -141,7 +149,6 @@ export default function App() {
   );
 }
 
-// ---------------- ESTILOS ----------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -203,16 +210,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
   },
+  inputContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 15,
+  },
+  textInput: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 15,
+    color: '#1e293b',
+  },
   addButton: {
     backgroundColor: '#0284c7',
-    paddingVertical: 14,
+    paddingHorizontal: 18,
     borderRadius: 8,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
   },
   buttonText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   list: {
