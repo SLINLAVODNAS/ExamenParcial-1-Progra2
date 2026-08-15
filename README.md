@@ -5,6 +5,7 @@ Nombre del estudiante: Neils Augusto Sandoval Gaitan
 instrucciones basicas para ejecutar el proyecto:
 
 Instalar dependencias:
-   ```bash
+
+ejecutar en la terminal:
    npm install
 
